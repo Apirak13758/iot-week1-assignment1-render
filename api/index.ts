@@ -1,7 +1,9 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import apiRouter from "./routes/api.js";
-import { handle } from "hono/vercel";
+import { serve } from "@hono/node-server";
+
+const ports = process.env.PORT || 3000;
 
 const app = new Hono().basePath("/api");
 
@@ -20,4 +22,13 @@ export const config = {
   runtime: "edge",
 };
 
-export default handle(app);
+serve(
+  {
+    fetch: app.fetch,
+    port: ports,
+  },
+  (info) => {
+    console.log(`Server is running on http://${info.address}:${info.port}`);
+  }
+);
+
